@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-scaffolding-framework
+module github.com/strickvl/terraform-provider-huggingface-spaces
 
 go 1.21
 
