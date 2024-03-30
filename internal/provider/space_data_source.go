@@ -21,8 +21,13 @@ type SpaceDataSource struct {
 
 // SpaceDataSourceModel describes the data source data model.
 type SpaceDataSourceModel struct {
-	ID   types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
+	ID           types.String `tfsdk:"id"`
+	Name         types.String `tfsdk:"name"`
+	Author       types.String `tfsdk:"author"`
+	LastModified types.String `tfsdk:"last_modified"`
+	Likes        types.Int64  `tfsdk:"likes"`
+	Private      types.Bool   `tfsdk:"private"`
+	SDK          types.String `tfsdk:"sdk"`
 }
 
 func (d *SpaceDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -36,6 +41,21 @@ func (d *SpaceDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Required: true,
 			},
 			"name": schema.StringAttribute{
+				Computed: true,
+			},
+			"author": schema.StringAttribute{
+				Computed: true,
+			},
+			"last_modified": schema.StringAttribute{
+				Computed: true,
+			},
+			"likes": schema.Int64Attribute{
+				Computed: true,
+			},
+			"private": schema.BoolAttribute{
+				Computed: true,
+			},
+			"sdk": schema.StringAttribute{
 				Computed: true,
 			},
 		},
@@ -89,7 +109,12 @@ func (d *SpaceDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	data.Name = types.StringValue(space["name"].(string))
+	data.Name = types.StringValue(space["id"].(string))
+	data.Author = types.StringValue(space["author"].(string))
+	data.LastModified = types.StringValue(space["lastModified"].(string))
+	data.Likes = types.Int64Value(int64(space["likes"].(float64)))
+	data.Private = types.BoolValue(space["private"].(bool))
+	data.SDK = types.StringValue(space["sdk"].(string))
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
