@@ -12,7 +12,7 @@ import (
 	"github.com/strickvl/terraform-provider-huggingface-spaces/internal/provider"
 )
 
-// Run "go generate" to format example terraform files and generate the docs for the registry/website
+// Run "go generate" to format example terraform files and generate the docs for the registry/website.
 
 // If you do not have terraform installed, you can remove the formatting command, but its suggested to
 // ensure the documentation is formatted properly.
@@ -20,7 +20,7 @@ import (
 
 // Run the docs generation tool, check its repository for more information on how it works and how docs
 // can be customized.
-//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate -provider-name scaffolding
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate -provider-name huggingface-spaces
 
 var (
 	// these will be set by the goreleaser configuration
@@ -38,10 +38,9 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		// TODO: Update this string with the published name of your provider.
 		// Also update the tfplugindocs generate command to either remove the
 		// -provider-name flag or set its value to the updated provider name.
-		Address: "registry.terraform.io/strickvl/terraform-provider-huggingface-spaces",
+		Address: "registry.terraform.io/strickvl/huggingface-spaces",
 		Debug:   debug,
 	}
 

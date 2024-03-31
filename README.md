@@ -1,64 +1,88 @@
-# Terraform Provider Scaffolding (Terraform Plugin Framework)
+# Terraform Provider for Hugging Face Spaces
 
-_This template repository is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). The template repository built on the [Terraform Plugin SDK](https://github.com/hashicorp/terraform-plugin-sdk) can be found at [terraform-provider-scaffolding](https://github.com/hashicorp/terraform-provider-scaffolding). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
-
-This repository is a *template* for a [Terraform](https://www.terraform.io) provider. It is intended as a starting point for creating Terraform providers, containing:
-
-- A resource and a data source (`internal/provider/`),
-- Examples (`examples/`) and generated documentation (`docs/`),
-- Miscellaneous meta files.
-
-These files contain boilerplate code that you will need to edit to create your own Terraform provider. Tutorials for creating Terraform providers can be found on the [HashiCorp Developer](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) platform. _Terraform Plugin Framework specific guides are titled accordingly._
-
-Please see the [GitHub template repository documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template) for how to create a new repository from this template on GitHub.
-
-Once you've written your provider, you'll want to [publish it on the Terraform Registry](https://developer.hashicorp.com/terraform/registry/providers/publishing) so that others can use it.
+The Terraform provider for [Hugging Face Spaces](https://huggingface.co/spaces) enables users to deploy, manage, and automate Hugging Face Spaces with Terraform. Inspired by the power and flexibility of Hugging Face's platform, this provider seeks to leverage Terraform's infrastructure as code approach to streamline the management of machine learning environments and applications.
 
 ## Requirements
 
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.21
+- Terraform 0.14.x
+- Go 1.17 (to build the provider plugin)
 
-## Building The Provider
+## Installing the Provider
 
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
+To install this provider, you need to build the provider binary and configure Terraform to use it:
 
-```shell
-go install
+```bash
+git clone https://github.com/YOUR_GITHUB/terraform-provider-huggingface-spaces.git
+cd terraform-provider-huggingface-spaces
+go build -o terraform-provider-huggingface-spaces
 ```
 
-## Adding Dependencies
+Next, follow the Terraform documentation to place the binary in the correct location for your platform, ensuring Terraform can discover and use the provider plugin.
 
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
+## Provider Configuration
 
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
+To use this provider, you must configure it with your Hugging Face API token. This token is used to authenticate API requests on your behalf.
 
-```shell
-go get github.com/author/dependency
-go mod tidy
+```hcl
+provider "huggingface-spaces" {
+  token = "your_hugging_face_api_token_here"
+}
 ```
 
-Then commit the changes to `go.mod` and `go.sum`.
+## Usage
 
-## Using the provider
+After installing and configuring the provider, you can start defining resources in your Terraform configurations. Here is a basic example:
 
-Fill this in for each provider
-
-## Developing the Provider
-
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
-
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
-
-To generate or update documentation, run `go generate`.
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
-
-```shell
-make testacc
+```hcl
+resource "huggingface-spaces_space" "zenml_server" {
+  name     = "test-zenml-space"
+  private  = false
+  template = "zenml/zenml"
+}
 ```
+
+This configuration will deploy a new Hugging Face Space using the zenml/zenml
+template.
+
+Other supported actions include:
+
+- destroying a space with `terraform destroy`
+- updating the name of a space by changing the resource's name in your HCL
+  definition and then rerunning `terraform apply`
+- updating the visibility (i.e. public vs private) of a space by changing the `private`
+  attribute and then rerunning `terraform apply`
+
+## Development
+
+Contributions to this provider are welcome. To contribute, please follow the standard GitHub pull request process.
+
+- Fork the repository
+- Make your changes
+- Submit a pull request
+
+### Building the Provider
+
+```
+go build -o terraform-provider-huggingface-spaces
+```
+
+### Running Tests
+
+To run the provider's tests, use:
+
+```
+go test ./...
+```
+
+## Contributing
+
+Contributions to improve the provider are welcome from the community. Please submit issues and pull requests with any suggestions or improvements.
+
+## License
+
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE.md) file for details.
+
+## Acknowledgments
+
+- Thanks to Hugging Face for their incredible platform.
+- Special thanks to Sean Kane and the HashiCorp documentation for guidance in creating Terraform providers.
