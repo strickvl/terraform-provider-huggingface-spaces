@@ -42,3 +42,99 @@ Other supported actions include:
   definition and then rerunning `terraform apply`
 - updating the visibility (i.e. public vs private) of a space by changing the `private`
   attribute and then rerunning `terraform apply`
+- updating and including variables and secrets for the space that is being
+  deployed / created
+- setting hardware requirements for the space
+- adding persistent storage for the space
+
+## Advanced Usage
+
+A more full use might look something like this:
+
+```hcl
+terraform {
+  required_providers {
+    huggingface-spaces = {
+      source = "strickvl/huggingface-spaces"
+    }
+  }
+}
+
+provider "huggingface-spaces" {
+  token = var.huggingface_token
+}
+
+variable "huggingface_token" {
+  type        = string
+  description = "The Hugging Face API token."
+  sensitive   = true
+}
+
+resource "huggingface-spaces_space" "test_space" {
+  name     = "test-hf-api-${formatdate("YYYYMMDD", timestamp())}"
+  private  = true
+  sdk      = "docker"
+  template = "zenml/zenml"
+
+  secrets = {
+    SECRET_KEY_1 = "secret_value_2"
+    SECRET_KEY_2 = "secret_value_3"
+  }
+
+  variables = {
+    VARIABLE_KEY_1 = "variable_value_1"
+    VARIABLE_KEY_2 = "variable_value_2"
+  }
+
+  hardware   = "cpu-upgrade"
+  storage    = "small"
+  sleep_time = 3600
+}
+
+data "huggingface-spaces_space" "test_space_data" {
+  id = huggingface-spaces_space.test_space.id
+}
+
+output "test_space_id" {
+  value = huggingface-spaces_space.test_space.id
+}
+
+output "test_space_name" {
+  value = data.huggingface-spaces_space.test_space_data.name
+}
+
+output "test_space_author" {
+  value = data.huggingface-spaces_space.test_space_data.author
+}
+
+output "test_space_last_modified" {
+  value = data.huggingface-spaces_space.test_space_data.last_modified
+}
+
+output "test_space_likes" {
+  value = data.huggingface-spaces_space.test_space_data.likes
+}
+
+output "test_space_private" {
+  value = data.huggingface-spaces_space.test_space_data.private
+}
+
+output "test_space_sdk" {
+  value = data.huggingface-spaces_space.test_space_data.sdk
+}
+
+output "test_space_hardware" {
+  value = data.huggingface-spaces_space.test_space_data.hardware
+}
+
+output "test_space_storage" {
+  value = data.huggingface-spaces_space.test_space_data.storage
+}
+
+output "test_space_sleep_time" {
+  value = data.huggingface-spaces_space.test_space_data.sleep_time
+}
+```
+
+This example demonstrates all the functionality of the Hugging Face Hub that
+this provider implements.
