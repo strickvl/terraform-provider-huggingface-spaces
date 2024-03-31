@@ -29,6 +29,9 @@ type SpaceDataSourceModel struct {
 	Likes        types.Int64  `tfsdk:"likes"`
 	Private      types.Bool   `tfsdk:"private"`
 	SDK          types.String `tfsdk:"sdk"`
+	Hardware     types.String `tfsdk:"hardware"`
+	Storage      types.String `tfsdk:"storage"`
+	SleepTime    types.Int64  `tfsdk:"sleep_time"`
 }
 
 func (d *SpaceDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -57,6 +60,15 @@ func (d *SpaceDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Computed: true,
 			},
 			"sdk": schema.StringAttribute{
+				Computed: true,
+			},
+			"hardware": schema.StringAttribute{
+				Computed: true,
+			},
+			"storage": schema.StringAttribute{
+				Computed: true,
+			},
+			"sleep_time": schema.Int64Attribute{
 				Computed: true,
 			},
 		},
@@ -159,6 +171,28 @@ func (d *SpaceDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		data.SDK = types.StringValue(sdk)
 	} else {
 		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'sdk' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	// Extract hardware, storage, and sleep time from the space JSON response
+	if hardware, ok := space["hardware"].(string); ok {
+		data.Hardware = types.StringValue(hardware)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'hardware' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	if storage, ok := space["storage"].(string); ok {
+		data.Storage = types.StringValue(storage)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'storage' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	if sleepTime, ok := space["sleepTime"].(float64); ok {
+		data.SleepTime = types.Int64Value(int64(sleepTime))
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'sleepTime' field is missing or not a number in the space JSON response")
 		return
 	}
 
