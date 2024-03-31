@@ -53,17 +53,33 @@ func (p *HuggingFaceSpacesProvider) Configure(ctx context.Context, req provider.
 		return
 	}
 
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
+	// Create a new HTTP client with the provided API token
+	client := &http.Client{}
+	if !data.Token.IsNull() && !data.Token.IsUnknown() {
+		client.Transport = &tokenTransport{
+			token:   data.Token.ValueString(),
+			wrapped: http.DefaultTransport,
+		}
+	}
 
-	// Example client configuration for data sources and resources
-	client := http.DefaultClient
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
 
+type tokenTransport struct {
+	token   string
+	wrapped http.RoundTripper
+}
+
+func (t *tokenTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", "Bearer "+t.token)
+	return t.wrapped.RoundTrip(req)
+}
+
 func (p *HuggingFaceSpacesProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{}
+	return []func() resource.Resource{
+		NewSpaceResource,
+	}
 }
 
 func (p *HuggingFaceSpacesProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
@@ -78,4 +94,8 @@ func New(version string) func() provider.Provider {
 			version: version,
 		}
 	}
+}
+
+func NewSpaceResource() resource.Resource {
+	return &SpaceResource{}
 }

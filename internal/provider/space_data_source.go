@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -92,15 +93,22 @@ func (d *SpaceDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
 	url := fmt.Sprintf("https://huggingface.co/api/spaces/%s", data.ID.ValueString())
+	log.Printf("[DEBUG] Requesting URL: %s", url)
+
 	httpResp, err := d.client.Get(url)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read space, got error: %s", err))
 		return
 	}
 	defer httpResp.Body.Close()
+
+	log.Printf("[DEBUG] Response Status Code: %d", httpResp.StatusCode)
+
+	if httpResp.StatusCode != http.StatusOK {
+		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Unexpected status code: %d", httpResp.StatusCode))
+		return
+	}
 
 	var space map[string]interface{}
 	err = json.NewDecoder(httpResp.Body).Decode(&space)
@@ -109,12 +117,50 @@ func (d *SpaceDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	data.Name = types.StringValue(space["id"].(string))
-	data.Author = types.StringValue(space["author"].(string))
-	data.LastModified = types.StringValue(space["lastModified"].(string))
-	data.Likes = types.Int64Value(int64(space["likes"].(float64)))
-	data.Private = types.BoolValue(space["private"].(bool))
-	data.SDK = types.StringValue(space["sdk"].(string))
+	// Log the space JSON response for debugging
+	log.Printf("[DEBUG] Space JSON Response: %+v", space)
+
+	if id, ok := space["id"].(string); ok {
+		data.Name = types.StringValue(id)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'id' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	if author, ok := space["author"].(string); ok {
+		data.Author = types.StringValue(author)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'author' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	if lastModified, ok := space["lastModified"].(string); ok {
+		data.LastModified = types.StringValue(lastModified)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'lastModified' field is missing or not a string in the space JSON response")
+		return
+	}
+
+	if likes, ok := space["likes"].(float64); ok {
+		data.Likes = types.Int64Value(int64(likes))
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'likes' field is missing or not a number in the space JSON response")
+		return
+	}
+
+	if private, ok := space["private"].(bool); ok {
+		data.Private = types.BoolValue(private)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'private' field is missing or not a boolean in the space JSON response")
+		return
+	}
+
+	if sdk, ok := space["sdk"].(string); ok {
+		data.SDK = types.StringValue(sdk)
+	} else {
+		resp.Diagnostics.AddError("Missing or Invalid Field", "The 'sdk' field is missing or not a string in the space JSON response")
+		return
+	}
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
