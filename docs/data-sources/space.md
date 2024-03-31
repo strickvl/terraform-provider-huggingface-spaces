@@ -18,9 +18,12 @@ description: |-
 ### Read-Only
 
 - `author` (String)
+- `hardware` (String)
 - `id` (String) The ID of this resource.
 - `last_modified` (String)
 - `likes` (Number)
 - `name` (String)
 - `private` (Boolean)
 - `sdk` (String)
+- `sleep_time` (Number)
+- `storage` (String)

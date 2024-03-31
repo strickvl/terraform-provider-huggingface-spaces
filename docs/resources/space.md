@@ -21,9 +21,14 @@ description: |-
 
 ### Optional
 
+- `hardware` (String)
 - `private` (Boolean)
 - `sdk` (String)
+- `secrets` (Map of String)
+- `sleep_time` (Number)
+- `storage` (String)
 - `template` (String)
+- `variables` (Map of String)
 
 ### Read-Only
 
