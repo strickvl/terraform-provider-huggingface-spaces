@@ -1,6 +1,6 @@
 # Terraform Provider for Hugging Face Spaces
 
-The Terraform provider for Hugging Face Spaces enables users to deploy, manage, and automate Hugging Face Spaces with Terraform. Inspired by the power and flexibility of Hugging Face's platform, this provider seeks to leverage Terraform's infrastructure as code approach to streamline the management of machine learning environments and applications.
+The Terraform provider for [Hugging Face Spaces](https://huggingface.co/spaces) enables users to deploy, manage, and automate Hugging Face Spaces with Terraform. Inspired by the power and flexibility of Hugging Face's platform, this provider seeks to leverage Terraform's infrastructure as code approach to streamline the management of machine learning environments and applications.
 
 ## Requirements
 
@@ -41,7 +41,16 @@ resource "huggingface-spaces_space" "zenml_server" {
 }
 ```
 
-This configuration will deploy a new Hugging Face Space using the zenml/zenml template.
+This configuration will deploy a new Hugging Face Space using the zenml/zenml
+template.
+
+Other supported actions include:
+
+- destroying a space with `terraform destroy`
+- updating the name of a space by changing the resource's name in your HCL
+  definition and then rerunning `terraform apply`
+- updating the visibility (i.e. public vs private) of a space by changing the `private`
+  attribute and then rerunning `terraform apply`
 
 ## Development
 
@@ -71,7 +80,7 @@ Contributions to improve the provider are welcome from the community. Please sub
 
 ## License
 
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE.md) file for details.
 
 ## Acknowledgments
 
