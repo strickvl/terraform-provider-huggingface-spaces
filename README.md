@@ -52,7 +52,6 @@ Other supported actions include:
 - updating the visibility (i.e. public vs private) of a space by changing the `private`
   attribute and then rerunning `terraform apply`
 
-
 ## Making a Release
 
 To make a release, follow these steps (using v0.0.2 as an example):
